@@ -51,5 +51,5 @@ function App(props) {
 
 
 export default GoogleApiWrapper({
-  apiKey: process.env.MAP_API_KEY,
+  apiKey: "AIzaSyByjTmKeSY_iDkv2qmn0U92cFcqvFgttEw",
 })(App);
