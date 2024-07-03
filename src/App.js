@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import "./App.css";
 import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
 
@@ -8,19 +9,41 @@ const mapStyles = {
 };
 
 function App(props) {
+
+  const [currentLocation, setCurrentLocation] = useState({ lat: 37.7749, lng: -122.4194 });
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setCurrentLocation({ lat: latitude, lng: longitude });
+          setError(null);
+        },
+        (error) => {
+          console.log(error);
+          setError("Unable to retrieve your location");
+        },
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+      );
+    } else {
+      setError("Geolocation is not supported by this browser.");
+    }
+  }, []);
+
   return (
-    <div className="App">
+    <div className="App" style={{ height: '100vh', width: '100%' }}>
+            {error && <p>{error}</p>}
       <Map
         google={props.google}
         zoom={14}
         style={mapStyles}
-        initialCenter={{
-          lat: 37.7749,
-          lng: -122.4194,
-        }}
+        center={currentLocation}
       >
-        <Marker position={{ lat: 37.7749, lng: -122.4194 }} />
+        <Marker position={currentLocation} />
       </Map>
+
     </div>
   );
 }
@@ -28,5 +51,5 @@ function App(props) {
 
 
 export default GoogleApiWrapper({
-  apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
+  apiKey: process.env.MAP_API_KEY,
 })(App);
